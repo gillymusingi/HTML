@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cool Website</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* LOADING SCREEN */
+#loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0b0b0b;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.7s ease;
+}
+
+.loader-circle {
+    width: 60px;
+    height: 60px;
+    border: 6px solid transparent;
+    border-top: 6px solid #f39c12;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+#loader.hide {
+    opacity: 0;
+}
+
+/* Animated Gradient Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -3;
+    background: linear-gradient(270deg, #1f1c2c, #928dab, #ff6b6b, #1f1c2c);
+    background-size: 800% 800%;
+    animation: gradientShift 30s ease infinite;
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* PARTICLE CANVAS */
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -2;
+}
+
+/* Navigation */
+nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 50px;
+    background: rgba(0,0,0,0.4);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+nav .logo {
+    font-weight: 700;
+    font-size: 1.5rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+}
+
+nav .contact-text {
+    position: absolute;
+    left: 20px;
+    font-weight: 600;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: 0.3s;
+}
+
+nav .contact-text:hover {
+    color: #f39c12;
+}
+
+nav .contact-text span {
+    transition: transform 0.4s ease;
+}
+
+nav .contact-text:hover span {
+    transform: rotate(360deg);
+}
+
+/* Header */
+header {
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background:
+    linear-gradient(500deg, rgba(0,0,1,0.5), rgba(0,0,1,0.5)),
+    url('this.jpg') center/cover no-repeat,
+    #111; /* fallback color */
+}
+
+header h1 {
+    font-size: 3.5rem;
+    color: #f0f0f0;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: 1s ease;
+    text-shadow: 0 0 10px gold, 0 0 20px #ffd700, 2px 2px 15px rgba(0,0,0,0.7);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+header.show h1 {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@keyframes glow {
+    0% { text-shadow: 0 0 5px gold, 0 0 10px #ffd700; }
+    100% { text-shadow: 0 0 15px gold, 0 0 30px #ffd700; }
+}
+
+/* Video Section */
+#video-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 0;
+    perspective: 1000px;
+    background: rgba(0,0,0,0.2);
+    opacity: 0;
+    transform: translateY(30px);
+    transition: 1s ease;
+}
+
+#video-section.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.video-card {
+    width: 400px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 15px;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.6);
+    position: relative;
+}
+
+.video-overlay-text {
+    position: absolute;
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    color: white;
+    background: rgba(0,0,0,0.6);
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 1rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.video-card:hover .video-overlay-text {
+    opacity: 1;
+}
+
+.video-card video {
+    width: 100%;
+    display: block;
+}
+
+/* GLASSMORPHISM BUTTON */
+.glass-btn {
+    margin-top: 30px;
+    padding: 15px 35px;
+    border-radius: 20px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.glass-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.45);
+}
+
+.glass-btn:active {
+    transform: scale(0.97);
+    background: rgba(255, 255, 255, 0.35);
+}
+
+/* Footer */
+footer {
+    background: rgba(0,0,0,0.7);
+    padding: 20px;
+    text-align: center;
+}
+
+footer p {
+    color: #ccc;
+    font-weight: bold;
+}
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100%;
+    background: rgba(0,0,0,0.95);
+    backdrop-filter: blur(6px);
+    box-shadow: -4px 0 12px rgba(0,0,0,0.5);
+    transition: 0.4s;
+    z-index: 20;
+    padding: 50px 20px;
+}
+
+.sidebar.active {
+    right: 0;
+}
+
+.sidebar h2 {
+    color: #f39c12;
+}
+
+.sidebar a {
+    color: white;
+    font-size: 1.2rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sidebar a:hover {
+    color: #f39c12;
+}
+
+.sidebar a img {
+    width: 24px;
+    transition: transform 0.5s ease;
+}
+
+.sidebar a img:hover {
+    transform: rotate(360deg);
+}
+
+/* Scroll to Top Button */
+#scrollTopBtn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #f39c12;
+    color: #fff;
+    border: none;
+    padding: 12px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    display: none;
+    z-index: 50;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    transition: background 0.3s ease;
+}
+
+#scrollTopBtn:hover {
+    background: #e67e22;
+}
+
+/* Responsive Video Block */
+@media (max-width: 768px) {
+    .video-card {
+        width: 70%;
+    }
+}
+
+@media (max-width: 480px) {
+    .video-card {
+        width: 90%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADING SCREEN -->
+<div id="loader">
+    <div class="loader-circle"></div>
+</div>
+
+<nav>
+    <div class="contact-text" onclick="toggleSidebar()">Contact Me <span>📱</span></div>
+    <div class="logo">Bruuh_its_gilo</div>
+</nav>
+
+<header id="home">
+    <h1>☮ Ƥ𝒆𝒶𝕔𝔼 ☮</h1>
+</header>
+
+<section id="video-section">
+
+    <div class="video-card" id="video-card">
+        <video id="myvideo" poster="that.jpg" width="600" muted loop>
+            <source src="cool-video.mp4" type="video/mp4">
+        </video>
+        <span class="video-overlay-text">Double-click for full view</span>
+    </div>
+
+    <button class="glass-btn">Cool Button</button>
+
+</section>
+
+<footer>
+    <p>&copy; 2025 Bruuh_its_gilo. All rights reserved.</p>
+</footer>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h2>Contact Me</h2>
+    <a href="https://instagram.com/Bruuh_its_gilo_" target="_blank">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"> Instagram
+    </a>
+</div>
+
+<!-- Scroll to Top -->
+<button id="scrollTopBtn" onclick="scrollToTop()">↑</button>
+
+<!-- PARTICLE CANVAS -->
+<canvas id="particle-canvas"></canvas>
+
+<script>
+// LOADER
+window.addEventListener("load", () => {
+    const loader = document.getElementById("loader");
+    loader.classList.add("hide");
+    setTimeout(() => loader.style.display = 'none', 700); // smooth removal
+});
+
+// SIDEBAR
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('active');
+}
+
+document.addEventListener('click', function(event) {
+    const sidebar = document.getElementById('sidebar');
+    const contactBtn = document.querySelector('.contact-text');
+    if (sidebar.classList.contains('active') &&
+        !sidebar.contains(event.target) &&
+        !contactBtn.contains(event.target)) {
+        sidebar.classList.remove('active');
+    }
+});
+
+// Close sidebar on link click
+document.querySelectorAll('.sidebar a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.remove('active');
+    });
+});
+
+document.addEventListener('keydown', function(event) {
+    if(event.key === "Escape") document.getElementById('sidebar').classList.remove('active');
+});
+
+// HEADER & VIDEO FADE-IN
+const header = document.querySelector('header');
+const videoSection = document.getElementById('video-section');
+
+const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+        if(entry.isIntersecting){
+            entry.target.classList.add('show');
+        }
+    });
+},{threshold:0.2});
+
+observer.observe(header);
+observer.observe(videoSection);
+
+// VIDEO CARD 3D TILT + INTERACTIONS
+const videoCard = document.getElementById('video-card');
+const video = document.getElementById('myvideo');
+let controlsAdded = false;
+
+videoCard.addEventListener('mouseenter', ()=>{ 
+    if(!controlsAdded) video.play(); 
+});
+
+videoCard.addEventListener('mouseleave', ()=>{
+    if(!controlsAdded) {
+        video.pause();
+        video.currentTime = 0;
+        video.load();
+    }
+    videoCard.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+});
+
+videoCard.addEventListener('mousemove', (e)=>{
+    const cardRect = videoCard.getBoundingClientRect();
+    const centerX = cardRect.left + cardRect.width/2;
+    const centerY = cardRect.top + cardRect.height/2;
+    const deltaX = e.clientX - centerX;
+    const deltaY = e.clientY - centerY;
+    const rotateX = (-deltaY / cardRect.height) * 15;
+    const rotateY = (deltaX / cardRect.width) * 15;
+    videoCard.style.transform = `rotateY(${rotateY}deg) rotateX(${rotateX}deg) scale(1.05)`;
+});
+
+videoCard.addEventListener('click', ()=>{ 
+    if(!controlsAdded){ 
+        if(video.paused) video.play(); 
+        else video.pause(); 
+    } 
+});
+
+videoCard.addEventListener('dblclick', ()=>{
+    controlsAdded = true;
+    video.muted = false;
+    video.loop = false;
+    video.setAttribute('controls','');
+    videoCard.style.transition = 'transform 0.5s ease';
+    videoCard.style.transform = 'rotateY(0deg) rotateX(0deg) scale(1)';
+    video.play();
+});
+
+video.addEventListener('ended', () => {
+    video.pause();
+    video.currentTime = 0;
+    video.removeAttribute('controls'); 
+    video.muted = true;       
+    controlsAdded = false;
+    video.load();
+});
+
+// SCROLL TO TOP
+const scrollBtn = document.getElementById('scrollTopBtn');
+window.addEventListener('scroll', ()=>{
+    if(window.scrollY > 300) scrollBtn.style.display = 'block';
+    else scrollBtn.style.display = 'none';
+});
+function scrollToTop(){
+    window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// PARTICLE EFFECTS
+const canvas = document.getElementById('particle-canvas');
+const ctx = canvas.getContext('2d');
+let particlesArray;
+
+function initParticles() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    particlesArray = [];
+    const numberOfParticles = 100;
+    for(let i = 0; i < numberOfParticles; i++){
+        particlesArray.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 3 + 1,
+            speedX: (Math.random() - 0.5) * 0.5,
+            speedY: (Math.random() - 0.5) * 0.5,
+            opacity: Math.random()
+        });
+    }
+}
+
+function animateParticles(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    particlesArray.forEach(p => {
+        const goldTint = `rgba(255, 215, 0, ${p.opacity})`;
+        ctx.fillStyle = goldTint;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.fill();
+
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if(p.x > canvas.width) p.x = 0;
+        if(p.x < 0) p.x = canvas.width;
+        if(p.y > canvas.height) p.y = 0;
+        if(p.y < 0) p.y = canvas.height;
+
+        p.opacity += (Math.random() - 0.5) * 0.05;
+        if(p.opacity > 1) p.opacity = 1;
+        if(p.opacity < 0) p.opacity = 0;
+    });
+    requestAnimationFrame(animateParticles);
+}
+
+window.addEventListener('resize', initParticles);
+
+initParticles();
+animateParticles();
+</script>
+
+</body>
+</html>
